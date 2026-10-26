@@ -1,7 +1,20 @@
-@'
+#@'
+#*
+#!pom.xml
+#!target/
+#!target/*.jar
+#!Dockerfile
+#'@ | Set-Content -Encoding ASCII .dockerignore
+
+# Ignore everything
 *
+
+# Allow what the Dockerfile needs
 !pom.xml
-!target/
-!target/*.jar
 !Dockerfile
-'@ | Set-Content -Encoding ASCII .dockerignore
+!src/
+!src/**
+!mvnw
+!mvnw.cmd
+!.mvn/
+!.mvn/**
