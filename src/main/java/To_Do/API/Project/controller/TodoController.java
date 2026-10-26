@@ -3,9 +3,11 @@ package To_Do.API.Project.controller;
 import To_Do.API.Project.dto.CreateTodoRequest;
 import To_Do.API.Project.dto.TodoResponse;
 import To_Do.API.Project.dto.UpdateTodoRequest;
+import To_Do.API.Project.entity.TodoStatus;
 import To_Do.API.Project.service.TodoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,14 +39,16 @@ public class TodoController {
 
     // Getting a list of todos
     @GetMapping
-    @Operation(summary = "List todos with optional filters")
+    @Operation(summary = "List todos with optional status/title filters")
     public List<TodoResponse> list(
-            @Parameter(description = "Filter by completion status")
-            @RequestParam(required = false) Boolean completed,
+            @Parameter(description = "Filter by status",
+                    schema = @Schema(allowableValues = {"PENDING", "IN_PROGRESS", "COMPLETED", "CANCELLED"}))
+            @RequestParam(required = false) TodoStatus status,
             @Parameter(description = "Case-insensitive title substring")
             @RequestParam(required = false) String title) {
-        log.info("GET /api/v1/todos completed={} title='{}'", completed, title);
-        return service.list(completed, title);
+
+        log.info("GET /api/v1/todos status={} title='{}'", status, title);
+        return service.list(status, title);
     }
 
     // Getting a todo

@@ -1,6 +1,7 @@
 package To_Do.API.Project.dto;
 
 import To_Do.API.Project.entity.Todo;
+import To_Do.API.Project.entity.TodoStatus;
 import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
@@ -14,7 +15,7 @@ public class TodoResponse {
     private Long id;
     private String title;
     private String description;
-    private boolean completed;
+    private TodoStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -23,7 +24,7 @@ public class TodoResponse {
                 .id(todo.getId())
                 .title(todo.getTitle())
                 .description(todo.getDescription())
-                .completed(todo.isCompleted())
+                .status(todo.getStatus())
                 .createdAt(todo.getCreatedAt())
                 .updatedAt(todo.getUpdatedAt())
                 .build();

@@ -1,5 +1,6 @@
 package To_Do.API.Project.dto;
 
+import To_Do.API.Project.entity.TodoStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -17,5 +18,7 @@ public class UpdateTodoRequest {
     @Size(max = 1000)
     private String description;
 
-    private boolean completed;
+    @Schema(description = "New status",
+            allowableValues = {"PENDING", "IN_PROGRESS", "COMPLETED", "CANCELLED"})
+    private TodoStatus status;
 }

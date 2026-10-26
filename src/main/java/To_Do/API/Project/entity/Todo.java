@@ -27,8 +27,9 @@ public class Todo {
     @Column(length = 1000)
     private String description;
 
-    @Column(nullable = false)
-    private boolean completed = false;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private TodoStatus status = TodoStatus.PENDING;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

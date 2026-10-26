@@ -4,6 +4,7 @@ import To_Do.API.Project.dto.CreateTodoRequest;
 import To_Do.API.Project.dto.TodoResponse;
 import To_Do.API.Project.dto.UpdateTodoRequest;
 import To_Do.API.Project.entity.Todo;
+import To_Do.API.Project.entity.TodoStatus;
 import To_Do.API.Project.exceptions.TodoNotFoundException;
 import To_Do.API.Project.repository.TodoRepository;
 import To_Do.API.Project.service.TodoService;
@@ -20,37 +21,40 @@ import java.util.List;
 public class TodoServiceImpl implements TodoService {
     private final TodoRepository repository;
 
-
     @Override
     @Transactional
     public TodoResponse create(CreateTodoRequest request) {
-        log.info("Creating todo with title='{}'", request.getTitle());
+        TodoStatus status = request.getStatus() != null ? request.getStatus() : TodoStatus.PENDING;
+        log.info("Creating todo title='{}' status={}", request.getTitle(), status);
+
         Todo saved = repository.save(Todo.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
-                .completed(request.isCompleted())
+                .status(status)
                 .build());
-        log.info("Todo created successfully id={} title='{}'", saved.getId(), saved.getTitle());
+
+        log.info("Todo created id={} status={}", saved.getId(), saved.getStatus());
         return TodoResponse.from(saved);
     }
 
     @Override
-    @Transactional
     public List<TodoResponse> list(Boolean completed, String title) {
-        log.info("Listing todos with filters completed={} title='{}'", completed, title);
-        List<Todo> todos;
+        return List.of();
+    }
 
-        if (completed != null && title != null) {
-            log.debug("Applying filters: completed + title");
-            todos = repository.findByCompletedAndTitleContainingIgnoreCase(completed, title);
-        } else if (completed != null) {
-            log.debug("Applying filter: completed={}", completed);
-            todos = repository.findByCompleted(completed);
+    @Transactional
+    @Override
+    public List<TodoResponse> list(TodoStatus status, String title) {
+        log.info("Listing todos status={} title='{}'", status, title);
+
+        List<Todo> todos;
+        if (status != null && title != null) {
+            todos = repository.findByStatusAndTitleContainingIgnoreCase(status, title);
+        } else if (status != null) {
+            todos = repository.findByStatus(status);
         } else if (title != null) {
-            log.debug("Applying filter: title contains='{}'", title);
             todos = repository.findByTitleContainingIgnoreCase(title);
         } else {
-            log.debug("No filters applied, returning all sorted by createdAt desc");
             todos = repository.findAllByOrderByCreatedAtDesc();
         }
 
@@ -74,31 +78,21 @@ public class TodoServiceImpl implements TodoService {
     @Override
     @Transactional
     public TodoResponse update(Long id, UpdateTodoRequest request) {
-        log.info("Updating todo id={} newTitle='{}'", id, request.getTitle());
-        Todo todo = repository.findById(id).orElseThrow(() -> {
-            log.warn("Cannot update — todo not found id={}", id);
-            return new TodoNotFoundException(id);
-        });
+        Todo todo = repository.findById(id).orElseThrow(() -> new TodoNotFoundException(id));
 
         log.debug("Before update: {}", todo);
         todo.setTitle(request.getTitle());
         todo.setDescription(request.getDescription());
-        todo.setCompleted(request.isCompleted());
+        if (request.getStatus() != null) {
+            todo.setStatus(request.getStatus());
+        }
         Todo saved = repository.save(todo);
-        log.debug("After update: {}", saved);
-        log.info("Todo updated id={}", saved.getId());
+        log.info("Todo updated id={} status={}", saved.getId(), saved.getStatus());
         return TodoResponse.from(saved);
     }
 
     @Override
-    @Transactional
     public void delete(Long id) {
-        log.info("Deleting todo id={}", id);
-        if (!repository.existsById(id)) {
-            log.warn("Cannot delete — todo not found id={}", id);
-            throw new TodoNotFoundException(id);
-        }
-        repository.deleteById(id);
-        log.info("Todo deleted id={}", id);
+
     }
 }
