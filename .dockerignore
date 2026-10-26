@@ -1,11 +1,3 @@
-#@'
-#*
-#!pom.xml
-#!target/
-#!target/*.jar
-#!Dockerfile
-#'@ | Set-Content -Encoding ASCII .dockerignore
-
 # Ignore everything
 *
 

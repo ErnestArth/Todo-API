@@ -64,7 +64,7 @@ public class TodoServiceImpl implements TodoService {
 
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public TodoResponse getById(Long id) {
         log.info("Fetching todo id={}", id);
         Todo todo = repository.findById(id).orElseThrow(() -> {
